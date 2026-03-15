@@ -21,7 +21,7 @@
     }
   }
 
-  $: allSelected = $fileList.every(f => f.selected);
+  $: allSelected = $fileList.length > 0 && $fileList.every(f => f.selected);
   $: someSelected = $fileList.some(f => f.selected);
 </script>
 
@@ -46,7 +46,7 @@
     </thead>
     <tbody>
       {#each $fileList as entry (entry.id)}
-        <tr class="row-{entry.status}" class:deselected={!entry.selected}>
+        <tr class:deselected={!entry.selected}>
           <td class="col-check">
             <input
               type="checkbox"
@@ -55,11 +55,11 @@
             />
           </td>
           <td class="name" title={entry.original_path}>{entry.original_name}</td>
-          <td class="name proposed">
+          <td class="name proposed" class:no-meta={entry.status === 'missing_metadata'}>
             {entry.proposed_name ?? '—'}
           </td>
-          <td>{entry.datetime_str ?? '—'}</td>
-          <td>{entry.camera_model ?? '—'}</td>
+          <td class="muted">{entry.datetime_str ?? '—'}</td>
+          <td class="muted">{entry.camera_model ?? '—'}</td>
           <td>
             <span class="badge badge-{entry.status}">{statusLabel(entry)}</span>
           </td>
@@ -73,67 +73,72 @@
   .table-wrapper {
     overflow-y: auto;
     flex: 1;
-    border: 1px solid #333;
+    border: 1px solid #2e2e2e;
     border-radius: 6px;
+    background: #1e1e1e;
   }
 
   table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.875em;
+    font-size: 0.85em;
   }
 
   thead {
     position: sticky;
     top: 0;
-    background: #1e1e1e;
+    background: #242424;
     z-index: 1;
   }
 
   th {
-    padding: 10px 12px;
+    padding: 8px 12px;
     text-align: left;
-    color: #888;
+    color: #666;
     font-weight: 600;
-    border-bottom: 1px solid #333;
+    font-size: 0.82em;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid #2e2e2e;
   }
 
   td {
-    padding: 8px 12px;
-    border-bottom: 1px solid #222;
-    color: #ccc;
+    padding: 7px 12px;
+    border-bottom: 1px solid #242424;
+    color: #c8c8c8;
     vertical-align: middle;
   }
 
   tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #252525; }
 
-  .col-check { width: 40px; text-align: center; }
+  .col-check { width: 38px; text-align: center; }
 
   .name {
     font-family: monospace;
-    max-width: 240px;
+    font-size: 0.95em;
+    max-width: 220px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .proposed { color: #4a9eff; }
+  .proposed { color: #5aabf0; }
+  .no-meta { color: #555; }
+  .muted { color: #666; }
 
-  .deselected td { opacity: 0.4; }
-
-  .row-ok:hover td { background: #1a2a1a; }
-  .row-conflict:hover td { background: #2a1f0a; }
-  .row-missing_metadata:hover td { background: #2a1a1a; }
+  .deselected td { opacity: 0.35; }
 
   .badge {
     display: inline-block;
     padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 0.8em;
-    font-weight: 600;
+    border-radius: 4px;
+    font-size: 0.78em;
+    font-weight: 700;
+    letter-spacing: 0.03em;
   }
 
-  .badge-ok { background: #1b3a1b; color: #4caf50; }
-  .badge-conflict { background: #3a2a00; color: #ff9800; }
-  .badge-missing_metadata { background: #3a1a1a; color: #f44336; }
+  .badge-ok               { background: #0d2e0d; color: #5ecf5e; border: 1px solid #1a4a1a; }
+  .badge-conflict         { background: #2e1f00; color: #e0931a; border: 1px solid #4a3500; }
+  .badge-missing_metadata { background: #2e0d0d; color: #e05050; border: 1px solid #4a1a1a; }
 </style>

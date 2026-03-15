@@ -23,7 +23,6 @@
     <input type="checkbox" bind:checked={$recursive} />
     Recursive (include subfolders)
   </label>
-
   <button
     class="btn-scan"
     disabled={!$folderPath || $appStatus === 'scanning'}
@@ -37,27 +36,29 @@
   .options-bar {
     display: flex;
     align-items: center;
-    gap: 20px;
-    padding: 10px 0;
+    gap: 16px;
+    flex-shrink: 0;
   }
   .checkbox-label {
     display: flex;
     align-items: center;
     gap: 6px;
-    color: #ccc;
+    color: #888;
     cursor: pointer;
     user-select: none;
+    font-size: 0.88em;
   }
   .btn-scan {
-    background: #4a9eff;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 22px;
+    background: #1a3a5c;
+    color: #6ab4ff;
+    border: 1px solid #2a5a8c;
+    border-radius: 5px;
+    padding: 6px 18px;
     cursor: pointer;
-    font-size: 0.95em;
+    font-size: 0.88em;
     font-weight: 600;
+    transition: background 0.15s;
   }
-  .btn-scan:hover:not(:disabled) { background: #3a8eef; }
-  .btn-scan:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-scan:hover:not(:disabled) { background: #1f4570; }
+  .btn-scan:disabled { opacity: 0.35; cursor: not-allowed; }
 </style>

@@ -13,15 +13,23 @@
     lastRenameResult,
     ffprobeAvailable,
     errorMessage,
+    renameLogs,
   } from '$lib/stores';
   import { executeRename, checkFfprobe, getRenameLogs } from '$lib/tauri';
-  import { renameLogs } from '$lib/stores';
 
   let showConfirm = false;
 
   onMount(async () => {
-    ffprobeAvailable.set(await checkFfprobe());
-    renameLogs.set(await getRenameLogs());
+    try {
+      ffprobeAvailable.set(await checkFfprobe());
+    } catch {
+      ffprobeAvailable.set(false);
+    }
+    try {
+      renameLogs.set(await getRenameLogs());
+    } catch {
+      renameLogs.set([]);
+    }
   });
 
   $: hasFiles = $fileList.length > 0;
@@ -44,7 +52,6 @@
         logPath: result.log_path,
       });
       renameLogs.set(await getRenameLogs());
-      // Clear the list — user should rescan if they want to proceed
       scanResult.set(null);
       fileList.set([]);
       appStatus.set('done');
@@ -59,25 +66,22 @@
   <header>
     <h1>ExifFileRenamer</h1>
     {#if !$ffprobeAvailable}
-      <div class="warning-banner">
+      <div class="banner banner-warn">
         ffprobe not found — video files (MOV/MP4) will not be processed.
-        Install FFmpeg and ensure it is on your PATH.
       </div>
     {/if}
   </header>
 
   <main>
-    <section class="top-section">
-      <FolderSelector />
-      <OptionsBar />
-    </section>
+    <FolderSelector />
+    <OptionsBar />
 
     {#if $errorMessage}
-      <div class="error-banner">{$errorMessage}</div>
+      <div class="banner banner-error">{$errorMessage}</div>
     {/if}
 
     {#if $appStatus === 'done' && $lastRenameResult}
-      <div class="success-banner">
+      <div class="banner banner-ok">
         Done! {$lastRenameResult.renamed} file{$lastRenameResult.renamed !== 1 ? 's' : ''} renamed,
         {$lastRenameResult.moved} moved to NoExif/.
       </div>
@@ -95,44 +99,40 @@
             {isRenaming ? 'Renaming…' : 'Rename selected'}
           </button>
         </div>
-
         <FileTable />
         <StatusBar />
       </div>
     {:else if $appStatus === 'idle' || $appStatus === 'done'}
-      <div class="empty-state">
-        Select a folder and click "Scan folder" to begin.
-      </div>
+      <div class="empty-state">Select a folder and click "Scan folder" to begin.</div>
     {:else if $appStatus === 'scanning'}
       <div class="empty-state">Scanning…</div>
     {/if}
 
     <UndoPanel />
   </main>
-
-  <ConfirmDialog bind:show={showConfirm} on:confirm={handleConfirm} />
 </div>
 
-<style>
-  :global(*, *::before, *::after) {
-    box-sizing: border-box;
-  }
+<ConfirmDialog bind:show={showConfirm} on:confirm={handleConfirm} />
 
-  :global(body) {
+<style>
+  :global(*, *::before, *::after) { box-sizing: border-box; }
+
+  :global(html, body) {
+    height: 100%;
     margin: 0;
-    background: #141414;
-    color: #ddd;
+    padding: 0;
+    background: #1a1a1a;
+    color: #e0e0e0;
     font-family: Inter, system-ui, sans-serif;
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1.5;
-    height: 100vh;
     overflow: hidden;
   }
 
   :global(input[type="checkbox"]) {
     accent-color: #4a9eff;
-    width: 15px;
-    height: 15px;
+    width: 14px;
+    height: 14px;
     cursor: pointer;
   }
 
@@ -140,16 +140,19 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
+    background: #1a1a1a;
   }
 
   header {
-    padding: 14px 24px 0;
     flex-shrink: 0;
+    padding: 14px 20px 10px;
+    border-bottom: 1px solid #2e2e2e;
+    background: #1a1a1a;
   }
 
   h1 {
-    margin: 0 0 10px;
-    font-size: 1.4em;
+    margin: 0 0 8px;
+    font-size: 1.3em;
     font-weight: 700;
     color: #4a9eff;
     letter-spacing: -0.02em;
@@ -159,16 +162,11 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 0 24px 16px;
+    padding: 12px 20px 14px;
     overflow: hidden;
-    gap: 12px;
-  }
-
-  .top-section {
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    gap: 10px;
+    background: #1a1a1a;
+    min-height: 0;
   }
 
   .table-section {
@@ -176,7 +174,8 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    gap: 8px;
+    gap: 6px;
+    min-height: 0;
   }
 
   .table-toolbar {
@@ -186,57 +185,40 @@
   }
 
   .selected-info {
-    color: #888;
-    font-size: 0.88em;
+    color: #777;
+    font-size: 0.85em;
   }
 
   .btn-rename {
-    background: #2e7a2e;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 22px;
-    font-size: 0.95em;
+    background: #1e5c1e;
+    color: #7eda7e;
+    border: 1px solid #2e7a2e;
+    border-radius: 5px;
+    padding: 6px 18px;
+    font-size: 0.88em;
     font-weight: 600;
     cursor: pointer;
+    transition: background 0.15s;
   }
-  .btn-rename:hover:not(:disabled) { background: #3a9a3a; }
-  .btn-rename:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-rename:hover:not(:disabled) { background: #256025; }
+  .btn-rename:disabled { opacity: 0.35; cursor: not-allowed; }
 
   .empty-state {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #555;
-    font-size: 1em;
+    color: #444;
+    font-size: 0.9em;
   }
 
-  .warning-banner {
-    background: #3a2a00;
-    color: #ff9800;
-    border: 1px solid #ff9800;
-    border-radius: 6px;
-    padding: 8px 14px;
-    font-size: 0.88em;
-    margin-bottom: 4px;
+  .banner {
+    border-radius: 5px;
+    padding: 7px 12px;
+    font-size: 0.85em;
+    flex-shrink: 0;
   }
-
-  .error-banner {
-    background: #3a1a1a;
-    color: #f44336;
-    border: 1px solid #f44336;
-    border-radius: 6px;
-    padding: 8px 14px;
-    font-size: 0.88em;
-  }
-
-  .success-banner {
-    background: #1b3a1b;
-    color: #4caf50;
-    border: 1px solid #4caf50;
-    border-radius: 6px;
-    padding: 8px 14px;
-    font-size: 0.88em;
-  }
+  .banner-warn  { background: #2a1f00; color: #e6a817; border: 1px solid #5a3f00; }
+  .banner-error { background: #2a1010; color: #e05050; border: 1px solid #5a2020; }
+  .banner-ok    { background: #0f2a0f; color: #5ecf5e; border: 1px solid #1e5a1e; }
 </style>

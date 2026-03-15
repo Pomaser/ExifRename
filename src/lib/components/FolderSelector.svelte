@@ -24,18 +24,11 @@
     const items = e.dataTransfer?.items;
     if (!items) return;
     for (const item of Array.from(items)) {
-      const entry = item.webkitGetAsEntry?.();
-      if (entry?.isDirectory) {
-        // Tauri provides full path via the File object
-        const file = item.getAsFile();
-        if (file) {
-          // @ts-ignore - Tauri exposes path on File
-          const p: string = file.path ?? '';
-          if (p) {
-            folderPath.set(p);
-            return;
-          }
-        }
+      const file = item.getAsFile();
+      if (file) {
+        // @ts-ignore - Tauri exposes path on File
+        const p: string = file.path ?? '';
+        if (p) { folderPath.set(p); return; }
       }
     }
   }
@@ -51,56 +44,59 @@
   aria-label="Drop zone for folder"
 >
   {#if $folderPath}
-    <p class="folder-path">{$folderPath}</p>
-    <button class="btn-secondary" on:click={pickFolder}>Change folder</button>
+    <span class="folder-path">{$folderPath}</span>
+    <button class="btn" on:click={pickFolder}>Change folder</button>
   {:else}
-    <p class="hint">Drop a folder here or</p>
-    <button class="btn-primary" on:click={pickFolder}>Browse…</button>
+    <span class="hint">Drop a folder here or</span>
+    <button class="btn btn-primary" on:click={pickFolder}>Browse…</button>
   {/if}
 </div>
 
 <style>
   .drop-zone {
-    border: 2px dashed #555;
-    border-radius: 8px;
-    padding: 24px 32px;
-    text-align: center;
-    transition: border-color 0.2s, background 0.2s;
-    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px dashed #383838;
+    border-radius: 6px;
+    padding: 12px 16px;
+    background: #222;
+    transition: border-color 0.15s, background 0.15s;
+    flex-shrink: 0;
   }
   .drop-zone.dragging {
     border-color: #4a9eff;
-    background: #1a2a3a;
+    background: #1a2535;
   }
   .hint {
-    color: #888;
-    margin: 0 0 12px;
+    color: #555;
+    font-size: 0.88em;
   }
   .folder-path {
+    flex: 1;
     font-family: monospace;
-    font-size: 0.9em;
-    color: #ccc;
-    word-break: break-all;
-    margin: 0 0 12px;
+    font-size: 0.85em;
+    color: #b0b0b0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
+  .btn {
+    background: #2a2a2a;
+    color: #b0b0b0;
+    border: 1px solid #3a3a3a;
+    border-radius: 5px;
+    padding: 5px 14px;
+    cursor: pointer;
+    font-size: 0.85em;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .btn:hover { background: #333; }
   .btn-primary {
-    background: #4a9eff;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 20px;
-    cursor: pointer;
-    font-size: 0.95em;
+    background: #1a3a5c;
+    color: #6ab4ff;
+    border-color: #2a5a8c;
   }
-  .btn-primary:hover { background: #3a8eef; }
-  .btn-secondary {
-    background: #333;
-    color: #ccc;
-    border: 1px solid #555;
-    border-radius: 6px;
-    padding: 6px 16px;
-    cursor: pointer;
-    font-size: 0.9em;
-  }
-  .btn-secondary:hover { background: #444; }
+  .btn-primary:hover { background: #1f4570; }
 </style>

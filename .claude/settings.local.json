@@ -15,7 +15,9 @@
       "Bash(pkg-config --exists gdk-3.0 webkit2gtk-4.1)",
       "Bash(pkill -f \"tauri dev\")",
       "Bash(pkill -f \"vite dev\")",
-      "Bash(pkill -f \"exiffilerenamer\")"
+      "Bash(pkill -f \"exiffilerenamer\")",
+      "Bash(npx svelte-kit:*)",
+      "Bash(curl -s http://localhost:1420/)"
     ]
   }
 }
