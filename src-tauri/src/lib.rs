@@ -6,7 +6,7 @@ mod renamer;
 use commands::rename::{execute_rename_impl, undo_rename_impl, RenameRequest, RenameResult};
 use commands::scan::scan_folder_impl;
 use log_manager::{list_logs, RenameLogSummary};
-use metadata::{ffprobe_reader::ffprobe_available, types::ScanResult};
+use metadata::types::ScanResult;
 use std::sync::Mutex;
 
 struct AppState {
@@ -71,11 +71,6 @@ async fn get_rename_logs() -> Result<Vec<RenameLogSummary>, String> {
     Ok(list_logs())
 }
 
-#[tauri::command]
-async fn check_ffprobe() -> bool {
-    ffprobe_available()
-}
-
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -91,7 +86,6 @@ pub fn run() {
             execute_rename,
             undo_rename,
             get_rename_logs,
-            check_ffprobe,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

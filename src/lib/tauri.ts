@@ -21,6 +21,3 @@ export async function getRenameLogs(): Promise<RenameLogSummary[]> {
   return invoke<RenameLogSummary[]>('get_rename_logs');
 }
 
-export async function checkFfprobe(): Promise<boolean> {
-  return invoke<boolean>('check_ffprobe');
-}

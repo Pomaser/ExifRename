@@ -11,20 +11,14 @@
     appStatus,
     scanResult,
     lastRenameResult,
-    ffprobeAvailable,
     errorMessage,
     renameLogs,
   } from '$lib/stores';
-  import { executeRename, checkFfprobe, getRenameLogs } from '$lib/tauri';
+  import { executeRename, getRenameLogs } from '$lib/tauri';
 
   let showConfirm = false;
 
   onMount(async () => {
-    try {
-      ffprobeAvailable.set(await checkFfprobe());
-    } catch {
-      ffprobeAvailable.set(false);
-    }
     try {
       renameLogs.set(await getRenameLogs());
     } catch {
@@ -65,11 +59,6 @@
 <div class="app">
   <header>
     <h1>ExifFileRenamer</h1>
-    {#if !$ffprobeAvailable}
-      <div class="banner banner-warn">
-        ffprobe not found — video files (MOV/MP4) will not be processed.
-      </div>
-    {/if}
   </header>
 
   <main>

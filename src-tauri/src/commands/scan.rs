@@ -1,6 +1,6 @@
 use crate::metadata::{
     exif_reader::read_image_metadata,
-    ffprobe_reader::read_video_datetime,
+    video_reader::read_video_datetime,
     types::{FileEntry, FileStatus, ScanResult},
 };
 use crate::renamer;
@@ -101,11 +101,10 @@ pub fn scan_folder_impl(folder: &str, recursive: bool) -> ScanResult {
             continue;
         }
         if let Some((proposed_name, is_conflict)) = collision_map.get(&entry.id) {
-            let proposed_path = format!(
-                "{}/{}",
-                folder,
-                proposed_name
-            );
+            let proposed_path = folder_path
+                .join(proposed_name)
+                .to_string_lossy()
+                .to_string();
             entry.proposed_name = Some(proposed_name.clone());
             entry.proposed_path = Some(proposed_path);
             if *is_conflict {
