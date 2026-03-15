@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create:*)",
+      "Bash(npx create-tauri-app@latest . --template svelte-ts --manager npm --identifier com.exiffilerenamer.app --yes)",
+      "Read(//home/pomi/Git/**)",
+      "Bash(npx create-tauri-app@latest ExifFileRenamer2 --template svelte-ts --manager npm --identifier com.exiffilerenamer.app --yes)",
+      "Bash(npm install:*)",
+      "Bash(cargo check:*)",
+      "Bash(rpm -q webkit2gtk4.1-devel gtk3-devel)",
+      "Bash(pkg-config --exists gdk-3.0)",
+      "Bash(sudo dnf:*)",
+      "Bash(cargo metadata:*)",
+      "Bash(python3 -c \"import sys,json; data=json.load\\(sys.stdin\\); pkg=[p for p in data[''''packages''''] if p[''''name'''']==''''tauri-plugin-dialog'''']; print\\(pkg[0][''''version''''] if pkg else ''''not found''''\\)\")",
+      "Bash(pkg-config --exists gdk-3.0 webkit2gtk-4.1)",
+      "Bash(pkill -f \"tauri dev\")",
+      "Bash(pkill -f \"vite dev\")",
+      "Bash(pkill -f \"exiffilerenamer\")"
+    ]
+  }
+}
