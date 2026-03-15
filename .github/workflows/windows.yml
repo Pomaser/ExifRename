@@ -1,9 +1,6 @@
 name: Windows Build
 
 on:
-  push:
-    branches:
-      - windows-build
   workflow_dispatch:
 
 jobs:
