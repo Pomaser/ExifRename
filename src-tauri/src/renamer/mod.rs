@@ -7,15 +7,15 @@ pub fn format_datetime(dt: &NaiveDateTime) -> String {
     dt.format("%Y%m%d_%H%M%S").to_string()
 }
 
-/// Given a list of (id, proposed_stem), detect intra-batch conflicts.
+/// Given a list of (id, proposed_stem, ext, original_path), detect intra-batch conflicts.
 /// Returns a map from id -> (final_proposed_name, has_conflict).
 pub fn resolve_collisions(
-    proposals: &[(String, String, String)], // (id, stem, ext)
+    proposals: &[(String, String, String, String)], // (id, stem, ext, original_path)
     folder: &Path,
 ) -> HashMap<String, (String, bool)> {
     // Count occurrences of each stem to detect batch conflicts
     let mut stem_count: HashMap<String, usize> = HashMap::new();
-    for (_, stem, _) in proposals {
+    for (_, stem, _, _) in proposals {
         *stem_count.entry(stem.clone()).or_insert(0) += 1;
     }
 
@@ -23,7 +23,7 @@ pub fn resolve_collisions(
     let mut stem_index: HashMap<String, usize> = HashMap::new();
     let mut result = HashMap::new();
 
-    for (id, stem, ext) in proposals {
+    for (id, stem, ext, original_path) in proposals {
         let count = stem_count[stem.as_str()];
         let has_batch_conflict = count > 1;
 
@@ -36,8 +36,8 @@ pub fn resolve_collisions(
             format!("{}.{}", stem, ext.to_uppercase())
         };
 
-        // Also check filesystem for pre-existing files
-        let final_name = ensure_no_fs_conflict(folder, &proposed_name);
+        // Also check filesystem for pre-existing files (ignoring the file's own current path)
+        let final_name = ensure_no_fs_conflict(folder, &proposed_name, Path::new(original_path));
         let is_conflict = has_batch_conflict || final_name != proposed_name;
 
         result.insert(id.clone(), (final_name, is_conflict));
@@ -46,10 +46,10 @@ pub fn resolve_collisions(
     result
 }
 
-/// If a file already exists on disk (and is not in the current batch), find a free name
-fn ensure_no_fs_conflict(folder: &Path, proposed: &str) -> String {
+/// If a file already exists on disk (and is not the file's own current path), find a free name
+fn ensure_no_fs_conflict(folder: &Path, proposed: &str, original_path: &Path) -> String {
     let mut candidate = PathBuf::from(folder).join(proposed);
-    if !candidate.exists() {
+    if !candidate.exists() || candidate == original_path {
         return proposed.to_string();
     }
 

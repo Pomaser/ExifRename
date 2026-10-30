@@ -13,7 +13,7 @@ const SUPPORTED_EXTENSIONS: &[&str] = &["jpg", "jpeg", "mov", "mp4"];
 pub fn scan_folder_impl(folder: &str, recursive: bool) -> ScanResult {
     let folder_path = Path::new(folder);
     let mut entries: Vec<FileEntry> = Vec::new();
-    let mut proposals: Vec<(String, String, String)> = Vec::new(); // (id, stem, ext)
+    let mut proposals: Vec<(String, String, String, String)> = Vec::new(); // (id, stem, ext, original_path)
 
     let walker = if recursive {
         WalkDir::new(folder_path).max_depth(usize::MAX)
@@ -64,7 +64,7 @@ pub fn scan_folder_impl(folder: &str, recursive: bool) -> ScanResult {
         if let Some((dt, camera_model)) = datetime_opt {
             let stem = renamer::format_datetime(&dt);
             let datetime_str = dt.format("%Y-%m-%d %H:%M:%S").to_string();
-            proposals.push((id.clone(), stem.clone(), ext.clone()));
+            proposals.push((id.clone(), stem.clone(), ext.clone(), original_path.clone()));
 
             entries.push(FileEntry {
                 id,

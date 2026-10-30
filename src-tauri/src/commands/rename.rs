@@ -41,7 +41,7 @@ pub fn execute_rename_impl(
                 let noexif_dir = Path::new(source_folder).join("NoExif");
                 fs::create_dir_all(&noexif_dir).map_err(|e| e.to_string())?;
 
-                let dest = ensure_unique_path(noexif_dir.join(&entry.original_name));
+                let dest = ensure_unique_path(noexif_dir.join(&entry.original_name), None);
                 fs::rename(&entry.original_path, &dest).map_err(|e| {
                     format!(
                         "Failed to move {} to NoExif: {}",
@@ -65,8 +65,11 @@ pub fn execute_rename_impl(
                     }
                 };
 
-                // Final filesystem collision check at rename time
-                let final_path = ensure_unique_path(std::path::PathBuf::from(&proposed_path));
+                // Final filesystem collision check at rename time (ignore the file's own current path)
+                let final_path = ensure_unique_path(
+                    std::path::PathBuf::from(&proposed_path),
+                    Some(Path::new(&entry.original_path)),
+                );
 
                 fs::rename(&entry.original_path, &final_path).map_err(|e| {
                     format!("Failed to rename {}: {}", entry.original_name, e)
@@ -92,8 +95,11 @@ pub fn execute_rename_impl(
     })
 }
 
-fn ensure_unique_path(path: std::path::PathBuf) -> std::path::PathBuf {
-    if !path.exists() {
+fn ensure_unique_path(
+    path: std::path::PathBuf,
+    original_path: Option<&Path>,
+) -> std::path::PathBuf {
+    if !path.exists() || original_path == Some(path.as_path()) {
         return path;
     }
     let stem = path
