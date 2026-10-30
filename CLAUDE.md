@@ -42,5 +42,5 @@ JPG, JPEG, MOV, MP4 — složka `NoExif/` pro soubory bez metadat
 
 ## Release
 GitHub: https://github.com/Pomaser/ExifRename
-Aktuální verze: v0.1.4
+Aktuální verze: v0.1.5
 Release vznikne automaticky přes `.github/workflows/build.yml` při pushnutí tagu `v*` (build Linux + Windows, `tauri-apps/tauri-action`). Verzi je potřeba sjednotit ve `package.json`, `src-tauri/Cargo.toml` a `src-tauri/tauri.conf.json` před vytvořením tagu.
