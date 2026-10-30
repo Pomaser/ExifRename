@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { getVersion } from '@tauri-apps/api/app';
   import FolderSelector from '$lib/components/FolderSelector.svelte';
   import OptionsBar from '$lib/components/OptionsBar.svelte';
   import FileTable from '$lib/components/FileTable.svelte';
@@ -17,12 +18,18 @@
   import { executeRename, getRenameLogs } from '$lib/tauri';
 
   let showConfirm = false;
+  let appVersion = '';
 
   onMount(async () => {
     try {
       renameLogs.set(await getRenameLogs());
     } catch {
       renameLogs.set([]);
+    }
+    try {
+      appVersion = await getVersion();
+    } catch {
+      appVersion = '';
     }
   });
 
@@ -58,7 +65,7 @@
 
 <div class="app">
   <header>
-    <h1>ExifFileRenamer</h1>
+    <h1>ExifFileRenamer {#if appVersion}<span class="version">v{appVersion}</span>{/if}</h1>
   </header>
 
   <main>
@@ -145,6 +152,14 @@
     font-weight: 700;
     color: #4a9eff;
     letter-spacing: -0.02em;
+  }
+
+  .version {
+    font-size: 0.65em;
+    font-weight: 500;
+    color: #666;
+    letter-spacing: 0;
+    margin-left: 4px;
   }
 
   main {
