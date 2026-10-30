@@ -31,6 +31,7 @@ src-tauri/src/
 
 ## Formát přejmenování
 `YYYYMMDD_HHMMSS.ext` — kolize řeší suffixem `_1`, `_2`, ...
+Kontrola kolize (`renamer::resolve_collisions` i `commands::rename::ensure_unique_path`) ignoruje případ, kdy navržená cesta je shodná s **vlastní** aktuální cestou souboru — jinak by opakovaný scan/rename už správně pojmenovaného souboru vyhodnotil self-match jako konflikt a zbytečně přidal `_1` (oprava v0.1.4).
 
 ## Priorita metadat u videí
 1. `com.apple.quicktime.creationdate` (moov→meta→keys/ilst) — lokální čas s offsetem, použít přímo
@@ -41,4 +42,5 @@ JPG, JPEG, MOV, MP4 — složka `NoExif/` pro soubory bez metadat
 
 ## Release
 GitHub: https://github.com/Pomaser/ExifRename
-Aktuální verze: v0.1.0
+Aktuální verze: v0.1.4
+Release vznikne automaticky přes `.github/workflows/build.yml` při pushnutí tagu `v*` (build Linux + Windows, `tauri-apps/tauri-action`). Verzi je potřeba sjednotit ve `package.json`, `src-tauri/Cargo.toml` a `src-tauri/tauri.conf.json` před vytvořením tagu.
