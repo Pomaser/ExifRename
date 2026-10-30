@@ -1,6 +1,6 @@
 [package]
 name = "exiffilerenamer"
-version = "0.1.3"
+version = "0.1.5"
 description = "ExifFileRenamer - rename files based on EXIF metadata"
 authors = []
 edition = "2021"

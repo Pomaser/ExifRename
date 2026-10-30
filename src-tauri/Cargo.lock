@@ -950,7 +950,7 @@ dependencies = [
 
 [[package]]
 name = "exiffilerenamer"
-version = "0.1.3"
+version = "0.1.5"
 dependencies = [
  "chrono",
  "dirs-next",
